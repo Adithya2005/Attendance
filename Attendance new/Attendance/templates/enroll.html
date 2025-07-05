@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h2>Enroll Face</h2>
+
+    <form method="post" enctype="multipart/form-data">
+      {% if current_user.role == 'admin' %}
+        <div class="mb-3">
+          <label class="form-label">Select Student</label>
+          <select name="user_id" class="form-select" required>
+            {% for s in students %}
+              <option value="{{ s._id|string }}">{{ s.name }} ({{ s.username }})</option>
+            {% endfor %}
+          </select>
+        </div>
+      {% endif %}
+
+      <div class="mb-3">
+        <label class="form-label">Upload Face Image</label>
+        <input class="form-control" type="file" name="image" accept="image/*" required>
+      </div>
+
+      <button class="btn btn-primary">Upload & Enroll</button>
+    </form>
+  </div>
+</div>
+{% endblock %}

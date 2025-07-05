@@ -1,0 +1,7 @@
+flask
+flask-login
+sqlalchemy
+pymysql
+bcrypt
+opencv-python
+face_recognition
