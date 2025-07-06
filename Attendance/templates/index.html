@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>Attendance Dashboard</h2>
+
+<form method="get" class="row g-2 mb-4">
+  <div class="col-auto">
+    <input class="form-control" type="date" name="start" value="{{ request.args.get('start','') }}">
+  </div>
+  <div class="col-auto">
+    <input class="form-control" type="date" name="end" value="{{ request.args.get('end','') }}">
+  </div>
+  <div class="col-auto">
+    <button class="btn btn-secondary">Filter</button>
+  </div>
+</form>
+
+<div class="row">
+  <!-- Attendance Table (left side) -->
+  <div class="col-md-8">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Photo</th>
+          <th>Name</th>
+          <th>Timestamp</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for r in records %}
+        <tr>
+          <td>
+            <img src="{{ url_for('uploaded_file', filename=record_images[r['_id'] | string]) }}"
+                 alt="Face" class="rounded" height="60">
+          </td>
+          <td>{{ users[r['user_id'] | string]['name'] }}</td>
+          <td>{{ r['timestamp'] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Live Camera Feed (right side) -->
+  <div class="col-md-4">
+    <h4>Live Camera</h4>
+    <img src="{{ url_for('video_feed') }}" alt="Live Feed" class="img-fluid rounded shadow">
+  </div>
+</div>
+
+<div id="recognition-status" class="mt-2 text-success"></div>
+
+<script>
+  function checkStatus() {
+    fetch('/recognition_status')
+      .then(response => response.json())
+      .then(data => {
+        const div = document.getElementById('recognition-status');
+        if (data.status === "marked") {
+          div.innerHTML = "✅ Attendance Marked";
+          div.className = "text-success";
+        } else if (data.status === "wrong") {
+          div.innerHTML = "❌ Wrong Person";
+          div.className = "text-danger";
+        } else {
+          div.innerHTML = "";
+        }
+      });
+  }
+
+  setInterval(checkStatus, 2000);
+</script>
+
+{% endblock %}

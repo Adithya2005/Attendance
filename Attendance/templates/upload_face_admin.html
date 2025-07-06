@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+  <div class="col-md-6">
+    <h2>Enroll Face</h2>
+
+    <!-- Upload From File -->
+    <form method="post" enctype="multipart/form-data" class="mb-4">
+      <div class="input-group">
+        <input class="form-control" type="file" name="image" accept="image/*">
+        <button class="btn btn-primary">Upload File</button>
+      </div>
+    </form>
+
+    <!-- Capture From Webcam -->
+    <div class="mb-4">
+      <button id="startCam" class="btn btn-outline-secondary">Use Webcam</button>
+      <button id="snap" class="btn btn-success" disabled>Capture & Enroll</button>
+    </div>
+    <video id="video" width="480" height="360" autoplay hidden class="border rounded mb-3"></video>
+    <canvas id="canvas" width="480" height="360" hidden></canvas>
+
+    <!-- Hidden form to send webcam snapshot -->
+    <form id="webcamForm" method="post">
+      <input type="hidden" name="webcamData" id="webcamData">
+    </form>
+  </div>
+</div>
+
+<script>
+  const startCam = document.getElementById('startCam');
+  const video    = document.getElementById('video');
+  const snapBtn  = document.getElementById('snap');
+  const canvas   = document.getElementById('canvas');
+  const input    = document.getElementById('webcamData');
+  const form     = document.getElementById('webcamForm');
+
+  startCam.onclick = async () => {
+    const stream = await navigator.mediaDevices.getUserMedia({video:true});
+    video.srcObject = stream;
+    video.hidden = false;
+    snapBtn.disabled = false;
+  };
+
+  snapBtn.onclick = () => {
+    canvas.getContext('2d').drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataURL = canvas.toDataURL('image/jpeg');
+    input.value = dataURL;  // embed base64
+    form.submit();
+  };
+</script>
+{% endblock %}
